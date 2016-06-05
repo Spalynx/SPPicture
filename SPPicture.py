@@ -22,25 +22,38 @@ buttons = [];                       #(list[photo])  -> Because of the ImageTk GC
 ZW,ZH = 300,300;                    #(int, int)     -> Zoom widht/height, is reset on window resize.
 coords = {"lastx":0, "lasty":0, "i_x":0, "i_y":0};
 
-
+#--------------- Mutators ------------------------------------
 def set_coords():
     c = canvas.coords(canvas.find_withtag("IMAGE"))
     coords["i_x"], coords["i_y"] = c[0], c[1];  #UPDATE COORDS
-    
 def set_full():
     '''Sets the program to a psuedo-fullscreen, taskbar buttons dissappear.'''
     global full;
     
     full = False if full else True; #flip/flop (bool) full
     root.overrideredirect(full);    #uses Tk.overrideredirect();
+def set_top():
+    ''' A flip/flop switch for whether the program stays above other programs. '''
+    global top;
+    
+    if (top):       #sets it persistant top level
+        root.title("[T]SPPicture V1");
+        root.after(1000,root.call('wm','attributes','.','-topmost',True));
+    else:           #resets it to not stay on top level.
+        root.title("SPPicture V1");
+        root.call('wm','attributes','.','-topmost',False)
+    #Flips the value of top.
+    top = False if top else True;
 
+#-------------- Accessor ------------------------------
 def get_img(browse=True): #browse = false is for setting picture in certain cases.
     '''Obtains image filename from user, and creates an image object for later use.'''
     global previous, current;
     filename = "";
     
     if(browse): #If browse is true it allows the user to browse for a file.
-        filename = tk.filedialog.askopenfilename(filetypes =(("Image Files", "*.jpeg;*.jpg;*.png;*.bmp")
+        from tkinter import filedialog
+        filename = filedialog.askopenfilename(filetypes =(("Image Files", "*.jpeg;*.jpg;*.png;*.bmp")
                                                             ,("Jpeg", "*.jpeg;*.jpg")
                                                             ,("Png", "*.png")
                                                             ,("Bitmap", "*.bmp")
@@ -62,7 +75,7 @@ def get_img(browse=True): #browse = false is for setting picture in certain case
     except:
         print("Processing of image failed.");
 
-#------------------ Draw Items to screen --------------------
+#------------------ Drawing Functions -----------------------
 def draw_img(zoom = False, x = 0, y = 0):
     '''Draws the image to the canvas.'''
     if (current == None):   #No image? Nope!
@@ -78,9 +91,7 @@ def draw_img(zoom = False, x = 0, y = 0):
         canvas.create_image(x,y, image = current, anchor = tk.NW, tag = "IMAGE");
     if(zoom):
         canvas.create_image(x,y, image = current, anchor = tk.CENTER, tag = "IMAGE")
-    draw_buttons();                         #redraw buttons, they were deleted 6 lines ago.
-
-    
+    draw_buttons();                         #redraw buttons, they were deleted 6 lines ago. 
 def draw_resized(event=None):
     '''Draws the image to screen, it's size based upon set width and height.'''
     global W_Width, W_Height, previous, current, ZW, ZH;
@@ -107,38 +118,37 @@ def draw_buttons():
     global buttons;
 
     #Draw all three buttons with their given images to the screen.
-    canvas.create_image(0,0, image=buttons[0], anchor = tk.NW, tag = "full");
-    canvas.create_image(15,0, image=buttons[1], anchor = tk.NW, tag = "img");
-    canvas.create_image(W_Width-15,0, image=buttons[2], anchor = tk.NW, tag = "top");
-    
+    canvas.create_text(7,7, fill = "white", activefill = "black", text = "F", anchor = tk.CENTER, tag = "full");
+    canvas.create_text(23,7, fill = "white", activefill = "black", text = "I", anchor = tk.CENTER, tag = "img");
+    canvas.create_text(W_Width-7,7, fill = "white", activefill = "black", text = "T", anchor = tk.CENTER, tag = "top");
+
+#------------------ Event handlers --------------------------
 def click (event):
     '''Event handler for mouse button down.'''
     global img; global col;
     x = event.x;    y = event.y;
 
     #Button animations for mouse click down at given coords.
+    img = None;
     if(x > 0 and x < 15 and y > 0 and y < 15):          #Full
         img = canvas.find_withtag("full"); col = 0;
-        canvas.itemconfigure(img, image = buttons[3]);
         set_full(); #Sets fullscreen, removes border.
         
     if(x > 15 and x < 30 and y > 0 and y < 15):         #Img
         img = canvas.find_withtag("img"); col = 1;
-        canvas.itemconfigure(img, image = buttons[3]);
         get_img(); draw_resized(None); #Resizes and draws img.
         
     if(x > W_Width-15 and x < W_Width and y > 0 and y < 15):#Top
         img = canvas.find_withtag("top"); col = 2;
-        canvas.itemconfigure(img, image = buttons[3]);
-        bring_window_to_front(); #Sets window to always top
-        
+        set_top(); #Sets window to always top
+    canvas.itemconfigure(img, text = "+");
 def click_release (event):
     ''' Mouse release event, just resets the button image. '''
     global img;
     x,y = event.x, event.y;
     if(y > 0 and y < 10):       #If it's within a certain y bound.
        if((x > 0 and x < 30) or (x > W_Width-15 and x < W_Width)): #and 3 x bound areas.
-           canvas.itemconfigure(img, image=buttons[col]);   #reset the button image.
+           canvas.itemconfigure(img, text=buttons[col]);   #reset the button image.
 def zoom_img(event):
     ''' Event handler for <ctrl-scroll>  redraws image with 50 px of zoom.'''
     global W_Width, W_Height, previous, current, ZW, ZH, coords;
@@ -190,12 +200,8 @@ def zoom_img(event):
         #mouse_x - Zoomed width/2
         coords["i_x"] = event.x - ZW/2; coords["i_y"] = event.y - ZH/2;
         draw_img(True, event.x, event.y);   #Scroll     -> Resizes at mouse.
-    
-
-          
 def mvmt_event(event):
     coords["lastx"], coords["lasty"] = event.x, event.y;
-    
 def drag_img(event):
     global coords;
     dx,dy = 0, 0;
@@ -214,25 +220,18 @@ def drag_img(event):
     canvas.delete("IMAGE");
     draw_img(False, coords["i_x"]+dx, coords["i_y"]+dy);
     set_coords();
-    
-def bring_window_to_front():
-    ''' A flip/flop switch for whether the program stays above other programs. '''
-    global top;
-    
-    if (top):       #sets it persistant top level
-        root.after(1000,root.call('wm','attributes','.','-topmost',True));
-    else:           #resets it to not stay on top level.
-        root.call('wm','attributes','.','-topmost',False)
-    #Flips the value of top.
-    top = False if top else True;
+def key_event(event):
+    print(event.keysym);
+    if(event.keysym == 'F' or event.keysym == 'f'):
+        set_full();
+    elif(event.keysym == 'I' or event.keysym == 'i'):
+        get_img(); draw_resized(None);
+    elif(event.keysym == 'T' or event.keysym == 't'):
+        set_top();
+    else: return;
 
 
-
-
-
-
-
-#---------------------- Main Program -------------------------------
+#=================== Main Program ===========================
 import sys;
 
 #Image argument invoked and passed to draw.
@@ -245,10 +244,9 @@ root.resizable(1,1);
 canvas = tk.Canvas(root, width=W_Width, height=W_Height, background = "black");
 
 #Adding button images to the buttons list.
-buttons.append(ImageTk.PhotoImage(file="data/Full.png"));
-buttons.append(ImageTk.PhotoImage(file="data/Img.png"));
-buttons.append(ImageTk.PhotoImage(file="data/Top.png"));
-buttons.append(ImageTk.PhotoImage(file="data/Def.png"));
+buttons.append('F');
+buttons.append('I');
+buttons.append("V");
 
 #Draw items to the canvas.
 draw_buttons();
@@ -264,6 +262,7 @@ canvas.bind("<Motion>", mvmt_event);
 canvas.bind("<Configure>", draw_resized);
 
 canvas.bind("<Control-MouseWheel>", zoom_img)
+root.bind("<Key>", key_event)
 root.bind("<Control-minus>", zoom_img);
 root.bind("<Control-equal>", zoom_img);
 
@@ -271,5 +270,5 @@ root.bind("<Control-equal>", zoom_img);
 canvas.pack(fill=tk.BOTH,expand=1);
 
 #Automatically brings the window to top level.
-bring_window_to_front();
+set_top();
 root.mainloop()

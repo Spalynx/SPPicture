@@ -6,9 +6,10 @@ Dependencies:	Python3, PIL(Pillow), Tkinter.
 Use:
 	The viewer allows dragging, and zooming (ctrl+plus/minus or ctrl+scroll) of the image.
 	Also there are three buttons, from left to right:
-		Full 	-> Shows/Hides the menu buttons and border from the program.
-		Img	-> User selection of the image to view.
-		Top	-> Switches between having the program always on top or not.
+		KEY	NAME	DESCRIPTION	
+		f	full 	Shows/Hides the menu buttons and border from the program.
+		i	img	User selection of the image to view.
+		t	top	Switches between having the program always on top or not.
 	An image can be selected as a parameter for the program.
 	Resizing the window resets the image zoom.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
