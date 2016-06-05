@@ -5,7 +5,10 @@ This program allows the user to select an image and display it in a floating box
 <div style="text-align:center">
 <img src ="https://cloud.githubusercontent.com/assets/12375983/15807563/22808c78-2b27-11e6-8101-419468ddc6eb.png" /></div>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Dependencies:	Python3, PIL(Pillow), Tkinter.
+Dependencies:	Python3,
+		PIL(Pillow	-> Pip install pillow
+		Tkinter		-> By default installed on windows install of python. If you recieve an error saying it isn't
+					installed, you might be running the program on python 2.*.
 Use:
 	The viewer allows dragging, and zooming (ctrl+plus/minus or ctrl+scroll) of the image.
 	Also there are three buttons, from left to right:
