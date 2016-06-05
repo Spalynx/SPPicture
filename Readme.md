@@ -1,6 +1,9 @@
 SPPicture v1
+
 This program allows the user to select an image and display it in a floating box on top of 
 	other programs on the computer.
+<div style="text-align:center">
+<img src ="https://cloud.githubusercontent.com/assets/12375983/15807563/22808c78-2b27-11e6-8101-419468ddc6eb.png" /></div>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Dependencies:	Python3, PIL(Pillow), Tkinter.
 Use:
