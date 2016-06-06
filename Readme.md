@@ -7,7 +7,7 @@ This program allows the user to select an image and display it in a floating box
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Dependencies:	
 		Python3,
-		PIL(Pillow	-> Pip install pillow
+		PIL(Pillow	-> To isntall, use command: pip install pillow
 		Tkinter		-> By default installed on windows install of python. If you recieve an error saying it isn't
 					installed, you might be running the program on python 2.*.
 Use:
